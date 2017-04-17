@@ -1,5 +1,30 @@
-h1 {
-    font-size: 30px;
-    background-color: blue;
-    color: red;
+body {
+    font-size: 0.875em;
+    font-family: "HPRegular",Arial,Helvetica,sans-serif;
+    line-height: 1.6;
 }
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+}
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+}
+
+#os-content-wrap {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+
