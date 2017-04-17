@@ -8,8 +8,9 @@ import (
 
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
+
 	t := template.New("main") //name of the template is main
-	t, _ = t.ParseFiles("static/templates/index.html") // parsing of template string
+	t, _ = t.ParseFiles("static/templates/index.html", "static/templates/header.html" ) // parsing of template string
 	t.ExecuteTemplate(w, "index.html", nil)
 }
 

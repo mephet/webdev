@@ -2,26 +2,29 @@ package main
 
 import (
 	"net/http"
-	//"html/template"
 	"github.com/gorilla/mux"
 	"../controllers"
-	"fmt"
+	"log"
 )
 
 
 var router = mux.NewRouter()
 
-func init() {
 
-}
 
 func main() {
-	fs := http.FileServer(http.Dir("static"))
-	fmt.Println(fs)
-	http.Handle("/css/", fs)
-	router.HandleFunc("/", controllers.HandleIndex)
+	router.HandleFunc("/index", controllers.HandleIndex)
 	router.HandleFunc("/about", controllers.HandleAbout)
-	http.ListenAndServe(":8080", router)
+	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.Path)
+		http.ServeFile(w, r, r.URL.Path[1:])
+	})
+	http.Handle("/", router)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 }
 
