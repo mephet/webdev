@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up Page</title>
+    <link rel="stylesheet" href="/static/css/os-init.css">
+    <link rel="stylesheet" href="/static/css/os-core.css">
+</head>
+<body>
+    <form action="/signup" method="POST" accept-charset="UTF-8">
+        <label for="email-input">Email: </label>
+        <input type="text" id="email-input" name="email-input"> {{.email_error}}
+        <br>
+        <label for="role-input">Role: </label>
+        <input type="text" id="role-input" name="role-input">
+        <br>
+        <label for="password-input">Type In Your Password</label>
+        <input type="text" id="password-input" name="password-input">
+        <br>
+        <label for="password-verify">Retype In Your Password</label>
+        <input type="text" id="password-verify" name="password-verify">{{.password_error}}
+        <br>
+        <input type="submit" value="Register">
+        {{ .csrfField }}
+    </form>
+
+</body>
+</html>
