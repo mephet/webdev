@@ -21,10 +21,11 @@ func main() {
 	router.HandleFunc("/signup", handlers.HandleSignupSubmit).Methods("POST")
 
 	// Fileserver to serve static files
-	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.URL.Path)
-		http.ServeFile(w, r, r.URL.Path[1:])
-	})
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	//router.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+	//	log.Println(r.URL.Path)
+	//	http.ServeFile(w, r, r.URL.Path[1:])
+	//})
 
 	http.Handle("/", router)
 	err := http.ListenAndServe(":8080", csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(router))

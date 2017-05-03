@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Login Page</title>
-    <link rel="stylesheet" href="/static/css/os-init.css">
-    <link rel="stylesheet" href="/static/css/os-core.css">
+    <link rel="stylesheet" href="../css/os-init.css">
+    <link rel="stylesheet" href="../css/os-core.css">
 </head>
 <body>
     <div id="os-page-wrap">
@@ -12,12 +12,11 @@
             <div id="login-container">
                 <form action="/login" method="post">
                     <label for="email-input">Email: </label>
-                    <input type="text" name="email-input" id="email-input">
+                    <input type="text" name="email-input" id="email-input"> {{ .loginError }}
                     <br>
                     <label for="password-input">Password: </label>
                     <input type="password" name="password-input" id="password-input">
                     <br>
-                    {{ .loginError }}
                     {{ .csrfField }}
                     <input type="submit" value="Submit">
                 </form>
