@@ -20,7 +20,7 @@ func init() {
 	store.Options = &sessions.Options{
 		Domain:   "localhost",
 		Path:     "/",
-		MaxAge:   60 * 5, // 5 mins
+		MaxAge:   20, // 5 mins
 		HttpOnly: true,
 	}
 }
@@ -46,14 +46,13 @@ func CheckValidLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		user := session.Values["User"].(User)
-
-		// Outputs user info to log
-		log.Println(user)
-
 		// If session expires, redirect to login page
-		if !user.IsLoggedIn {
+		if session.Values["User"] == nil {
 			http.Redirect(w, r, "/login", 301)
+		} else {
+			user := session.Values["User"].(User)
+			// Outputs user info to log
+			log.Println("User login valid: " + user.Email)
 		}
 	}
 

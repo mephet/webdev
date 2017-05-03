@@ -10,13 +10,14 @@
     <div id="os-page-wrap">
         <div id="os-content-wrap">
             <div id="login-container">
-                <form action="/index" method="post">
-                    <label for="username-input">Username: </label>
-                    <input type="text" name="username-input" id="username-input">
+                <form action="/login" method="post">
+                    <label for="email-input">Email: </label>
+                    <input type="text" name="email-input" id="email-input">
                     <br>
                     <label for="password-input">Password: </label>
                     <input type="password" name="password-input" id="password-input">
                     <br>
+                    {{ .loginError }}
                     {{ .csrfField }}
                     <input type="submit" value="Submit">
                 </form>

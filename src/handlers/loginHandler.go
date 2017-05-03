@@ -2,33 +2,57 @@ package handlers
 
 import (
 	"net/http"
-	"io/ioutil"
 	"log"
-	"html/template"
 	"github.com/gorilla/csrf"
+	_ "github.com/lib/pq"
+	"database/sql"
+	"../config"
 )
 
+
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	CreateSession(w, r, "Dave", "Yogpod", "dave@hp.com")
-	t := template.New("login")
-	path := r.URL.Path[1:]
-	// Scan all files in dir static/templates and parse them into fileInfo
-	dirName := "static/templates"
-	templateDir, err := ioutil.ReadDir(dirName)
-	if err != nil {
-		log.Print("Template cant be read")
-		log.Println(err)
-	}
-	//
-	////Walk through the FileInfo array and Parse files as templates
-	for _, templateName := range templateDir {
-		t, err = t.ParseFiles(dirName + "/" + templateName.Name()) // parsing of template string
-		if err != nil {
-			log.Println(err)
-		}
-	}
+
 	var csrf = map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
 	}
-	t.ExecuteTemplate(w, path+".html", csrf)
+	execTemplate("login", csrf, r, w)
+}
+
+func HandleLoginSubmit(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	email := r.FormValue("email-input")
+	password := r.FormValue("password-input")
+
+	isValid, firstName, lastName := validateLogin(email, password)
+	if isValid {
+		CreateSession(w, r, firstName, lastName, email)
+		http.Redirect(w, r, "/index", 301)
+	} else {
+		m := make(map[string]interface{})
+		m["loginError"] = "Incorrect Email/Password Combination!"
+		m[csrf.TemplateTag] = csrf.TemplateField(r)
+		execTemplate("login", m, r, w)
+	}
+}
+
+func validateLogin(email string, password string) (bool, string, string) {
+	db, err := sql.Open("postgres", config.DbInfo)
+	if err != nil {
+		log.Println(err)
+	}
+	defer db.Close()
+	var emailResult string
+	var firstName string
+	var lastName string
+	queryErr := db.QueryRow("SELECT Email, FirstName, LastName FROM UserAccounts WHERE Email = $1 AND password = $2", email, password).Scan(&emailResult, &firstName, &lastName)
+	switch {
+	case queryErr == sql.ErrNoRows:
+		log.Println("Incorrect Username/Password combination")
+		return false, firstName, lastName
+	case queryErr != nil:
+		log.Println(queryErr)
+		return false, firstName, lastName
+	default:
+		return true, firstName, lastName
+	}
 }

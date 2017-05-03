@@ -45,14 +45,14 @@ func doesUsernameExist(email string) bool{
 	}
 }
 
-func addUserAccount(email string, password string, role string) bool{
+func addUserAccount(firstName string, lastName string, email string, password string, role string) bool{
 	db, err := sql.Open("postgres", config.DbInfo)
 	if err != nil {
 		log.Println(err)
 	}
 	defer db.Close()
 
-	_, queryErr := db.Query("INSERT INTO UserAccounts (Email, password, Role) VALUES($1, $2, $3)", email, password, role)
+	_, queryErr := db.Query("INSERT INTO UserAccounts (Email, password, Role, FirstName, LastName) VALUES($1, $2, $3, $4, $5)", email, password, role, firstName, lastName)
 	if queryErr != nil {
 		log.Println(err)
 		return false
@@ -63,8 +63,8 @@ func addUserAccount(email string, password string, role string) bool{
 
 }
 
-func execTemplate(pipeString map[string]interface{}, r *http.Request, w http.ResponseWriter) {
-	t := template.New("signup")
+func execTemplate(templateName string, pipeString map[string]interface{}, r *http.Request, w http.ResponseWriter) {
+	t := template.New(templateName)
 	path := r.URL.Path[1:];
 	// Scan all files in dir static/templates and parse them into fileInfo
 	dirName := "static/templates"
@@ -86,11 +86,13 @@ func HandleSignup(w http.ResponseWriter, r *http.Request) {
 	var csrf = map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
 	}
-	execTemplate(csrf, r, w)
+	execTemplate("signup", csrf, r, w)
 }
 
 func HandleSignupSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	firstName := r.FormValue("firstname-input")
+	lastName := r.FormValue("lastname-input")
 	email := r.FormValue("email-input")
 	role := r.FormValue("role-input")
 	password := r.FormValue("password-input")
@@ -100,16 +102,16 @@ func HandleSignupSubmit(w http.ResponseWriter, r *http.Request) {
 		m := make(map[string]interface{})
 		m["email_error"] = "Email already exists!"
 		m[csrf.TemplateTag] = csrf.TemplateField(r)
-		execTemplate(m, r, w)
+		execTemplate("signup", m, r, w)
 	} else if !doPasswordsMatch(password, passwordV) {
 		//Construct the template and pass the data interface (err + csrf) into the template on wrong password
 		m := make(map[string]interface{})
 		m["password_error"] = "Passwords do not match!"
 		m[csrf.TemplateTag] = csrf.TemplateField(r)
-		execTemplate(m, r, w)
+		execTemplate("signup", m, r, w)
 	} else {
-		addUserAccount(email, password, role)
-		redirectTarget := "/signupsuccess"
+		addUserAccount(firstName, lastName, email, password, role)
+		redirectTarget := "/login"
 		http.Redirect(w, r, redirectTarget, 302)
 	}
 }

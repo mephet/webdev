@@ -7,9 +7,6 @@ import (
 	"html/template"
 )
 
-func checkValidLogin() {
-
-}
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	log.Println("Index Page Redirected...")

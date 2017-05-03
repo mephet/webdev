@@ -15,7 +15,8 @@ var router = mux.NewRouter()
 func main() {
 	router.HandleFunc("/index", handlers.HandleIndex)
 	router.HandleFunc("/about", handlers.HandleAbout)
-	router.HandleFunc("/login", handlers.HandleLogin)
+	router.HandleFunc("/login", handlers.HandleLogin).Methods("GET")
+	router.HandleFunc("/login", handlers.HandleLoginSubmit).Methods("POST")
 	router.HandleFunc("/signup", handlers.HandleSignup).Methods("GET")
 	router.HandleFunc("/signup", handlers.HandleSignupSubmit).Methods("POST")
 
