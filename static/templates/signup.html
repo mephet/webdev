@@ -2,32 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up Page</title>
-    <link rel="stylesheet" href="/static/css/os-init.css">
-    <link rel="stylesheet" href="/static/css/os-core.css">
-</head>
-<body>
-    <form action="/signup" method="POST" accept-charset="UTF-8">
-        <label for="firstname-input">First Name: </label>
-        <input type="text" id="firstname-input" name="firstname-input">
-        <label for="lastname-input">Last Name: </label>
-        <input type="text" id="lastname-input" name="lastname-input">
-        <br>
-        <label for="email-input">Email: </label>
-        <input type="text" id="email-input" name="email-input"> {{.email_error}}
-        <br>
-        <label for="role-input">Role: </label>
-        <input type="text" id="role-input" name="role-input">
-        <br>
-        <label for="password-input">Type In Your Password</label>
-        <input type="text" id="password-input" name="password-input">
-        <br>
-        <label for="password-verify">Retype In Your Password</label>
-        <input type="text" id="password-verify" name="password-verify">{{.password_error}}
-        <br>
-        <input type="submit" value="Register">
-        {{ .csrfField }}
-    </form>
+    <title>Registration Page</title>
+    <link rel="stylesheet" href="../css/os-init.css">
+    <link rel="stylesheet" href="../css/os-core.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
 
+
+
+        function doPasswordsMatch(pass1, pass2, message) {
+            if (pass1.val() !== pass2.val()) {
+                message.html("<p>Passwords Do Not Match!</p>");
+                return false;
+            } else {
+                message.html("");
+                return true;
+            }
+        }
+
+        function validateForm() {
+            var pass1 = $("#password-input");
+            var pass2 = $("#password-verify");
+            var errMsg = $("#passwordV-validation");
+
+            return doPasswordsMatch(pass1, pass2, errMsg);
+        }
+
+
+        $(document).ready(function() {
+            var pass1 = $("#password-input");
+            var pass2 = $("#password-verify");
+            var errMsg = $("#passwordV-validation");
+
+            pass1.change(function() {
+                doPasswordsMatch(pass1, pass2, errMsg);
+            });
+            pass2.change(function() {
+                doPasswordsMatch(pass1, pass2, errMsg);
+            });
+
+        });
+
+
+    </script>
+</head>
+
+<body>
+    <div id="outer-container">
+        <div id="inner-container">
+            <form action="/signup" method="POST" accept-charset="UTF-8" onsubmit="return validateForm()">
+                <label for="firstname-input">First Name: </label>
+                <input type="text" id="firstname-input" name="firstname-input" required>
+                <err id="firstname-validation"></err>
+                <br>
+                <label for="lastname-input">Last Name: </label>
+                <input type="text" id="lastname-input" name="lastname-input" required>
+                <err id="lastname-validation"></err>
+                <br>
+                <label for="email-input">Email: </label>
+                <input type="email" id="email-input" name="email-input" required> {{.email_error}}
+                <err id="email-validation"></err>
+                <br>
+                <label for="role-input">Role: </label>
+                <input type="text" id="role-input" name="role-input" required>
+                <err id="role-validation"></err>
+                <br>
+                <label for="password-input">Type In Your Password</label>
+                <input type="password" id="password-input" name="password-input" required>
+                <err id="password-validation"></err>
+                <br>
+                <label for="password-verify">Retype In Your Password</label>
+                <input type="password" id="password-verify" name="password-verify" required>{{.password_error}}
+                <err id="passwordV-validation"></err>
+                <br>
+                <input type="submit" value="Register">
+                {{ .csrfField }}
+            </form>
+        </div>
+    </div>
 </body>
 </html>

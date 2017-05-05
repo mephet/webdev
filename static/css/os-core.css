@@ -32,4 +32,26 @@ h1 {
     background-color: blue;
 }
 
+/*Containers*/
+#page-wrap {
+    width: 100%;
+}
+
+
+.outer-container {
+    margin:0 auto;
+    width: 80%;
+    height:auto;
+    background-color: #fff;
+}
+
+.inner-container {
+    float: left;
+    height:auto;
+    margin:12px 0px 0px 18px;
+}
+
+err {
+    display: inline-block;
+}
 

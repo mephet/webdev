@@ -12,10 +12,10 @@
             <div id="login-container">
                 <form action="/login" method="post">
                     <label for="email-input">Email: </label>
-                    <input type="text" name="email-input" id="email-input"> {{ .loginError }}
+                    <input type="email" name="email-input" id="email-input" required> {{ .loginError }}
                     <br>
                     <label for="password-input">Password: </label>
-                    <input type="password" name="password-input" id="password-input">
+                    <input type="password" name="password-input" id="password-input" required>
                     <br>
                     {{ .csrfField }}
                     <input type="submit" value="Submit">

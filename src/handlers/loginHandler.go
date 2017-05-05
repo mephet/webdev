@@ -23,9 +23,9 @@ func HandleLoginSubmit(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email-input")
 	password := r.FormValue("password-input")
 
-	isValid, firstName, lastName := validateLogin(email, password)
+	isValid, firstName, lastName, accessLevel := validateLogin(email, password)
 	if isValid {
-		CreateSession(w, r, firstName, lastName, email)
+		CreateSession(w, r, firstName, lastName, email, accessLevel)
 		http.Redirect(w, r, "/index", 301)
 	} else {
 		m := make(map[string]interface{})
@@ -35,7 +35,8 @@ func HandleLoginSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func validateLogin(email string, password string) (bool, string, string) {
+
+func validateLogin(email string, password string) (bool, string, string, string) {
 	db, err := sql.Open("postgres", config.DbInfo)
 	if err != nil {
 		log.Println(err)
@@ -44,15 +45,16 @@ func validateLogin(email string, password string) (bool, string, string) {
 	var emailResult string
 	var firstName string
 	var lastName string
-	queryErr := db.QueryRow("SELECT Email, FirstName, LastName FROM UserAccounts WHERE Email = $1 AND password = $2", email, password).Scan(&emailResult, &firstName, &lastName)
+	var accessLevel string
+	queryErr := db.QueryRow("SELECT email, firstname, lastname, accesslevel FROM useraccounts WHERE email = $1 AND password = $2", email, password).Scan(&emailResult, &firstName, &lastName, &accessLevel)
 	switch {
 	case queryErr == sql.ErrNoRows:
 		log.Println("Incorrect Username/Password combination")
-		return false, firstName, lastName
+		return false, firstName, lastName, accessLevel
 	case queryErr != nil:
 		log.Println(queryErr)
-		return false, firstName, lastName
+		return false, firstName, lastName, accessLevel
 	default:
-		return true, firstName, lastName
+		return true, firstName, lastName, accessLevel
 	}
 }

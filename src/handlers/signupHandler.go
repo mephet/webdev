@@ -19,7 +19,7 @@ func doPasswordsMatch(p1 string, p2 string) bool{
 	}
 }
 
-func doesUsernameExist(email string) bool{
+func doesEmailExist(email string) bool{
 	var rowCount int
 
 	db, err := sql.Open("postgres", config.DbInfo)
@@ -45,6 +45,15 @@ func doesUsernameExist(email string) bool{
 	}
 }
 
+func isInputPopulated(inputList []string) bool {
+	for _, val := range inputList {
+		if val == "" {
+			return false
+		}
+	}
+	return true
+}
+
 func addUserAccount(firstName string, lastName string, email string, password string, role string) bool{
 	db, err := sql.Open("postgres", config.DbInfo)
 	if err != nil {
@@ -52,9 +61,9 @@ func addUserAccount(firstName string, lastName string, email string, password st
 	}
 	defer db.Close()
 
-	_, queryErr := db.Query("INSERT INTO UserAccounts (Email, password, Role, FirstName, LastName) VALUES($1, $2, $3, $4, $5)", email, password, role, firstName, lastName)
+	_, queryErr := db.Query("INSERT INTO useraccounts (email, password, role, firstname, lastname, accesslevel) VALUES($1, $2, $3, $4, $5, $6)", email, password, role, firstName, lastName, "STANDARD")
 	if queryErr != nil {
-		log.Println(err)
+		log.Println(queryErr)
 		return false
 	} else {
 		log.Printf("User Account Created! Email: %s, Role: %s Inserted into UserAccounts Table.", email, role)
@@ -63,11 +72,11 @@ func addUserAccount(firstName string, lastName string, email string, password st
 
 }
 
-func execTemplate(templateName string, pipeString map[string]interface{}, r *http.Request, w http.ResponseWriter) {
-	t := template.New(templateName)
+func execTemplate(tName string, pipeString map[string]interface{}, r *http.Request, w http.ResponseWriter) {
+	t := template.New(tName)
 	path := r.URL.Path[1:];
 	// Scan all files in dir static/templates and parse them into fileInfo
-	dirName := "static/templates"
+	dirName := config.TEMPLATE_DIR
 	templateDir, err := ioutil.ReadDir(dirName)
 	if err != nil {
 		log.Println(err)
@@ -97,8 +106,9 @@ func HandleSignupSubmit(w http.ResponseWriter, r *http.Request) {
 	role := r.FormValue("role-input")
 	password := r.FormValue("password-input")
 	passwordV := r.FormValue("password-verify")
+	log.Println(firstName, lastName, email, role, password)
 
-	if doesUsernameExist(email) {
+	if doesEmailExist(email) {
 		m := make(map[string]interface{})
 		m["email_error"] = "Email already exists!"
 		m[csrf.TemplateTag] = csrf.TemplateField(r)
